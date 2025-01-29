@@ -1,5 +1,6 @@
 _G.love = require("love")
-_G.Classe = require("Classes")
+_G.Classe = require("PlayerEstr")
+_G.Power = require("powerUpEstr")
 
 function love.load()
     Gamemode = 1
@@ -12,25 +13,30 @@ function love.load()
         Player2 = Classe1:new(400, 400)
     }
 
-    WindowW = love.graphics.getWidth()
+    WinW = love.graphics.getWidth()
+    Tempo = 0
     Titulo = love.graphics.newImage("img/GuerraDeNaves.png")
-
-    Skills_Ativas = {}
+    PowerUpArt = love.graphics.newImage("img/PowerUpImg.png")
 end
 
 function love.update(dt)
-    WindowW = love.graphics.getWidth()
+    WinW = love.graphics.getWidth()
     if Gamemode == 1 then
 
     elseif Gamemode == 2 then
+        Tempo = Tempo + dt
+
 
         if Players.Player ~= nil then
             Players.Player:inputTeclado("w", "a", "s", "d", "f", Players.Player2)
             Players.Player:cooldown(dt)
-            for _, skill in ipairs(Players.Player.Skills_Ativas) do
+
+            for i, skill in pairs(Players.Player.Skills_Ativas) do
                 skill:MoveSkill()
-                skill:Kill(Players.Player)
-                skill:Hit(Players.Player, Players.Player2)
+                if skill:KillCond(Players.Player2) then
+                    skill:Hit(Players.Player2)
+                    table.remove(Players.Player.Skills_Ativas, i)
+                end
             end
         end
 
@@ -38,10 +44,12 @@ function love.update(dt)
             Players.Player2:inputTeclado("up", "left", "down", "right", "l", Players.Player)
             Players.Player2:cooldown(dt)
 
-            for _, skill in ipairs(Players.Player2.Skills_Ativas) do
+            for i, skill in pairs(Players.Player2.Skills_Ativas) do
                 skill:MoveSkill()
-                skill:Kill(Players.Player2)
-                skill:Hit(Players.Player2, Players.Player)
+                if skill:KillCond(Players.Player) then
+                    skill:Hit(Players.Player)
+                    table.remove(Players.Player2.Skills_Ativas, i)
+                end
             end
 
             for i, player in pairs(Players) do
@@ -52,13 +60,25 @@ function love.update(dt)
         end
     end
 
+    if math.floor(Tempo)%5 == 0 and Tempo > 1 then
+        table.insert(TabelaPoderes, Poder1:new())
+    end
+
+    if #TabelaPoderes ~= 0 then
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        for _, poder in ipairs(TabelaPoderes) do
+            love.graphics.draw(PowerUpArt, poder.X, poder.Y)
+        end
+    end
 end
 
 
 function love.draw()
     if Gamemode == 1 then
         --love.graphics.print("Batalha de Naves", love.graphics.getWidth()/2-220, love.graphics.getHeight()/6, 0, 4)
+        love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(Titulo, love.graphics.getWidth()/2-180, love.graphics.getHeight()/6, 0, 4)
+        
         love.graphics.setColor(255/255, 255/255, 255/255)
 
         love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2, 200, 100)
@@ -67,6 +87,7 @@ function love.draw()
     elseif Gamemode == 2 then
         love.graphics.setBackgroundColor(0, 0, 0)
 
+        -- CRIA JOGADORES
         if Players.Player ~= nil then
             love.graphics.setColor(Players.Player.R, Players.Player.G, Players.Player.B)
             love.graphics.rectangle("fill", Players.Player.X, Players.Player.Y, Players.Player.W, Players.Player.H)
@@ -75,17 +96,17 @@ function love.draw()
             love.graphics.print("0", 0, 0, 0, 3)
         end
 
-
         if Players.Player2 ~= nil then
             love.graphics.setColor(Players.Player2.R, Players.Player2.G, Players.Player2.B)
             love.graphics.rectangle("fill", Players.Player2.X, Players.Player2.Y, Players.Player2.W, Players.Player2.H)
-            love.graphics.print(Players.Player2.HP, WindowW - 30, 0, 0, 3)
+            love.graphics.print(Players.Player2.HP, WinW - 30, 0, 0, 3)
         else
-            love.graphics.print("0", WindowW - 30, 0, 0, 3)
+            love.graphics.print("0", WinW - 30, 0, 0, 3)
         end
 
 
-        if Players.Player  ~= nil then
+        -- CRIA SKILLS
+        if Players.Player ~= nil then
             for _, skill in ipairs(Players.Player.Skills_Ativas) do
                 love.graphics.setLineWidth(2)
                 love.graphics.setColor(255/255, 0/255, 0/255)
