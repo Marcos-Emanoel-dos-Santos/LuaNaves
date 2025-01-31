@@ -1,8 +1,10 @@
 _G.love = require("love")
 _G.Classe = require("PlayerEstr")
-_G.Power = require("powerUpEstr")
+_G.Power = require("poderesEstr")
 
 function love.load()
+    math.randomseed(os.time())
+
     Gamemode = 1
     Fullscreen = true
     love.window.setFullscreen(Fullscreen, "desktop")
@@ -15,8 +17,11 @@ function love.load()
 
     WinW = love.graphics.getWidth()
     Tempo = 0
+    UltimoTempo = 0
     Titulo = love.graphics.newImage("img/GuerraDeNaves.png")
-    PowerUpArt = love.graphics.newImage("img/PowerUpImg.png")
+    Poder1Art = love.graphics.newImage("img/Poder1Img.png")
+    Poder2Art = love.graphics.newImage("img/PowerUpImg.png")
+    TabelaPoderes = {}
 end
 
 function love.update(dt)
@@ -25,49 +30,61 @@ function love.update(dt)
 
     elseif Gamemode == 2 then
         Tempo = Tempo + dt
+        if math.floor(Tempo)%5 == 0 and Tempo > UltimoTempo + 4 then
+            local n = math.random(1, 2)
+            if n == 1 then
+                table.insert(TabelaPoderes, Poder1:new(math.random(0, love.graphics.getWidth()-32), math.random(0, love.graphics.getHeight()-32)))
+            elseif n == 2 then
+                table.insert(TabelaPoderes, Poder2:new(math.random(0, love.graphics.getWidth()-32), math.random(0, love.graphics.getHeight()-32)))
+            end
+            UltimoTempo = Tempo
+        end
 
 
         if Players.Player ~= nil then
+            Players.Player:update(dt)
             Players.Player:inputTeclado("w", "a", "s", "d", "f", Players.Player2)
             Players.Player:cooldown(dt)
+
+            for i, poder in ipairs(TabelaPoderes) do
+                if Players.Player:colisao(poder) then
+                    Players.Player:coletaPoder(poder, poder.Duracao, dt)
+                    table.remove(TabelaPoderes, i)
+                end
+            end
 
             for i, skill in pairs(Players.Player.Skills_Ativas) do
                 skill:MoveSkill()
                 if skill:KillCond(Players.Player2) then
-                    skill:Hit(Players.Player2)
                     table.remove(Players.Player.Skills_Ativas, i)
                 end
             end
         end
 
         if Players.Player2 ~= nil then
+            Players.Player2:update(dt)
             Players.Player2:inputTeclado("up", "left", "down", "right", "l", Players.Player)
             Players.Player2:cooldown(dt)
+
+            for i, poder in ipairs(TabelaPoderes) do
+                if Players.Player2:colisao(poder) then
+                    Players.Player2:coletaPoder(poder, poder.duracao)
+                    table.remove(TabelaPoderes, i)
+                end
+            end
 
             for i, skill in pairs(Players.Player2.Skills_Ativas) do
                 skill:MoveSkill()
                 if skill:KillCond(Players.Player) then
-                    skill:Hit(Players.Player)
                     table.remove(Players.Player2.Skills_Ativas, i)
                 end
             end
-
-            for i, player in pairs(Players) do
-                if player.HP < 1 then
-                    Players[i] = nil
-                end
-            end
         end
-    end
 
-    if math.floor(Tempo)%5 == 0 and Tempo > 1 then
-        table.insert(TabelaPoderes, Poder1:new())
-    end
-
-    if #TabelaPoderes ~= 0 then
-        love.graphics.setColor(255/255, 255/255, 255/255)
-        for _, poder in ipairs(TabelaPoderes) do
-            love.graphics.draw(PowerUpArt, poder.X, poder.Y)
+        for i, player in pairs(Players) do
+            if player.HP < 1 then
+                Players[i] = nil
+            end
         end
     end
 end
@@ -128,6 +145,16 @@ function love.draw()
         end
     end
 
+
+    --CRIA PODERES
+    love.graphics.setColor(255/255, 255/255, 255/255)
+    for _, poder in ipairs(TabelaPoderes) do
+        if poder.Id == 1 then
+            love.graphics.draw(Poder1Art, poder.X, poder.Y)
+        elseif poder.Id == 2 then
+            love.graphics.draw(Poder2Art, poder.X, poder.Y)
+        end
+    end
 end
 
 function love.keypressed(k)

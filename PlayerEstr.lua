@@ -7,6 +7,7 @@ function Classe1:new(pX, pY)
     -- DEFINE AMONTOADO DE VARIÁVEL
     Obj.X, Obj.Y = pX, pY
     Obj.Spd = 5
+    Obj.SkillSpd = 10
     Obj.W, Obj.H = 100, 100
     Obj.HP = 5
     Obj.R, Obj.G, Obj.B = 255/255, 255/255, 255/255
@@ -14,9 +15,10 @@ function Classe1:new(pX, pY)
     Obj.UltimoMovimento = "c"
     Obj.teclasApertadas = {}
 
-    Obj.Cd = 0.5
+    Obj.Cd = 0.8
     Obj.SkillCooldown = 0
     Obj.Skills_Ativas = {}
+    Obj.Buffs = {}
 
 
     setmetatable(Obj, {__index = Classe1})
@@ -62,14 +64,14 @@ function Classe1:new(pX, pY)
 
     function Classe1:inputTeclado(a, b, c, d, e, colidir)
         local dir = {
-            {"ec",{-self.Spd, self.Spd}},
-            {"eb",{-self.Spd, -self.Spd}},
-            {"dc",{self.Spd, -self.Spd}},
-            {"db",{self.Spd, self.Spd}},
-            {"e",{-self.Spd, 0}},
-            {"c",{0, -self.Spd}},
-            {"b",{0, self.Spd}},
-            {"d",{self.Spd, 0}}
+            {"ec", {-self.SkillSpd, self.SkillSpd}},
+            {"eb", {-self.SkillSpd, -self.SkillSpd}},
+            {"dc", {self.SkillSpd, -self.SkillSpd}},
+            {"db", {self.SkillSpd, self.SkillSpd}},
+            {"e", {-self.SkillSpd, 0}},
+            {"c", {0, -self.SkillSpd}},
+            {"b", {0, self.SkillSpd}},
+            {"d", {self.SkillSpd, 0}}
         }
         local Comb = {
             {{b, c}, function (self, colidir) self:Mover(-self.Spd, self.Spd, colidir) end, "ec"},
@@ -110,40 +112,60 @@ function Classe1:new(pX, pY)
         return x+w > objX and  x < objX+objW and  y+h > objY and  y < objY+objH
     end
 
+    function Classe1:coletaPoder(poder, duracao, dt)
+        poder.Ativar(self, duracao, dt)
+    end
+
     return Obj
 end
 
+function Classe1:update(dt)
+    for i, v in ipairs(self.Buffs) do
+        v[1]()
+        v.tempo = v.tempo - dt
+        if v.tempo <= 0 then
+            self.Cd = 0.5
+            table.remove(self.Buffs, i)
+        end
+    end
+end
 
-function Skill:new(dirX, dirY, x, y, w, h)
+
+-- HABILIDADE PRINCIPAL
+function Skill:new(spdX, spdY, x, y, w, h)
     local nova_skill = {}
 
     -- AMONTOADO DE VARIÁVEL
-    nova_skill.Viva = true
-    nova_skill.Spd = 10
     nova_skill.Raio = 10
     nova_skill.X, nova_skill.Y = x + w/2, y + h/2
     nova_skill.R, nova_skill.G, nova_skill.B = 255/255, 255/255, 255/255
-    nova_skill.DirX, nova_skill.DirY = dirX, dirY
+    nova_skill.SpdX, nova_skill.SpdY = spdX, spdY
 
 
     setmetatable(nova_skill, {__index = Skill})
 
     function Skill:MoveSkill()
-        self.X = self.X + self.DirX
-        self.Y = self.Y + self.DirY
+        self.X = self.X + self.SpdX
+        self.Y = self.Y + self.SpdY
     end
 
     function Skill:KillCond(...)
         for _, v in ipairs({...}) do
-            return self.X+self.Raio > v.X and
+            if (self.X+self.Raio > v.X and
             self.X-self.Raio < v.X+v.W and
             self.Y+self.Raio > v.Y and
-            self.Y-self.Raio < v.Y+v.H
+            self.Y-self.Raio < v.Y+v.H)
+            then
+                self:Hit(v)
+                return true
+            end
         end
-        return self.X > love.graphics.getWidth() or
+        if self.X > love.graphics.getWidth() or
         self.Y > love.graphics.getHeight() or
         self.X < 0 or self.Y < 0 or
-        self.DirX == 0 and self.DirY == 0
+        self.DirX == 0 and self.DirY == 0 then
+            return true
+        end
     end
 
     function Skill:Hit(...)
