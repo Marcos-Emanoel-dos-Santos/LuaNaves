@@ -6,7 +6,6 @@ function Poder1:new(x, y)
     novo_poder.X = x
     novo_poder.Y = y
     novo_poder.W, novo_poder.H = 32, 32
-    novo_poder.Cooldown = 5
     novo_poder.Id = 1
     novo_poder.duracao = nil
 
@@ -29,16 +28,19 @@ function Poder2:new(x, y)
     novo_poder.X = x
     novo_poder.Y = y
     novo_poder.W, novo_poder.H = 32, 32
-    novo_poder.Cooldown = 5
     novo_poder.Id = 2
 
     novo_poder.Ativar = function (player)
-        table.insert(player.Buffs, {function () player.Cd = 0.2 end, tempo = 3.5})
+        table.insert(player.Buffs, {
+            function ()
+                player.Cd, player.R, player.G, player.B = 0.2, 255/255, 180/255, 180/255
+         end, tempo = 3.5})
     end
 
 
     setmetatable(novo_poder, {__index = Poder2})
     return novo_poder
 end
+
 
 return Poder1, Poder2

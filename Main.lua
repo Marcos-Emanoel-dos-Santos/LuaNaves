@@ -1,31 +1,33 @@
 _G.love = require("love")
 _G.Classe = require("PlayerEstr")
 _G.Power = require("poderesEstr")
+_G.Reset = require("Set")
 
 function love.load()
     math.randomseed(os.time())
 
-    Gamemode = 1
+    dofile("ProjetosAula/proj10/Set.lua")
+
     Fullscreen = true
     love.window.setFullscreen(Fullscreen, "desktop")
-    love.graphics.setBackgroundColor(55/255, 55/255, 55/255)
 
-    Players = {
-        Player = Classe1:new(100, 100),
-        Player2 = Classe1:new(400, 400)
-    }
-
-    WinW = love.graphics.getWidth()
-    Tempo = 0
-    UltimoTempo = 0
     Titulo = love.graphics.newImage("img/GuerraDeNaves.png")
     Poder1Art = love.graphics.newImage("img/Poder1Img.png")
     Poder2Art = love.graphics.newImage("img/PowerUpImg.png")
-    TabelaPoderes = {}
+    AnimacaoPlayer = {
+        [1] = love.graphics.newImage("img/naveC.png"),
+        [2] = love.graphics.newImage("img/naveDC.png"),
+        [3] = love.graphics.newImage("img/naveD.png"),
+        [4] = love.graphics.newImage("img/naveDB.png"),
+        [5] = love.graphics.newImage("img/naveB.png"),
+        [6] = love.graphics.newImage("img/naveEB.png"),
+        [7] = love.graphics.newImage("img/naveE.png"),
+        [8] = love.graphics.newImage("img/naveEC.png")
+    }
 end
 
+
 function love.update(dt)
-    WinW = love.graphics.getWidth()
     if Gamemode == 1 then
 
     elseif Gamemode == 2 then
@@ -33,9 +35,9 @@ function love.update(dt)
         if math.floor(Tempo)%5 == 0 and Tempo > UltimoTempo + 4 then
             local n = math.random(1, 2)
             if n == 1 then
-                table.insert(TabelaPoderes, Poder1:new(math.random(0, love.graphics.getWidth()-32), math.random(0, love.graphics.getHeight()-32)))
+                table.insert(TabelaPoderes, Poder1:new(math.random(0, WinW-32), math.random(0, love.graphics.getHeight()-32)))
             elseif n == 2 then
-                table.insert(TabelaPoderes, Poder2:new(math.random(0, love.graphics.getWidth()-32), math.random(0, love.graphics.getHeight()-32)))
+                table.insert(TabelaPoderes, Poder2:new(math.random(0, WinW-32), math.random(0, love.graphics.getHeight()-32)))
             end
             UltimoTempo = Tempo
         end
@@ -44,7 +46,6 @@ function love.update(dt)
         if Players.Player ~= nil then
             Players.Player:update(dt)
             Players.Player:inputTeclado("w", "a", "s", "d", "f", Players.Player2)
-            Players.Player:cooldown(dt)
 
             for i, poder in ipairs(TabelaPoderes) do
                 if Players.Player:colisao(poder) then
@@ -64,7 +65,6 @@ function love.update(dt)
         if Players.Player2 ~= nil then
             Players.Player2:update(dt)
             Players.Player2:inputTeclado("up", "left", "down", "right", "l", Players.Player)
-            Players.Player2:cooldown(dt)
 
             for i, poder in ipairs(TabelaPoderes) do
                 if Players.Player2:colisao(poder) then
@@ -84,6 +84,7 @@ function love.update(dt)
         for i, player in pairs(Players) do
             if player.HP < 1 then
                 Players[i] = nil
+                dofile("ProjetosAula/proj10/Set.lua")
             end
         end
     end
@@ -92,35 +93,21 @@ end
 
 function love.draw()
     if Gamemode == 1 then
-        --love.graphics.print("Batalha de Naves", love.graphics.getWidth()/2-220, love.graphics.getHeight()/6, 0, 4)
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(Titulo, love.graphics.getWidth()/2-180, love.graphics.getHeight()/6, 0, 4)
-        
-        love.graphics.setColor(255/255, 255/255, 255/255)
 
+        love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2, 200, 100)
         love.graphics.setColor(0/255, 0/255, 0/255)
         love.graphics.print("Jogar", love.graphics.getWidth()/2-30, love.graphics.getHeight()/2+35, 0, 2)
+
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2+125, 200, 100)
+        love.graphics.setColor(0/255, 0/255, 0/255)
+        love.graphics.print("Opções", love.graphics.getWidth()/2-43, love.graphics.getHeight()/2+160, 0, 2)
+
     elseif Gamemode == 2 then
         love.graphics.setBackgroundColor(0, 0, 0)
-
-        -- CRIA JOGADORES
-        if Players.Player ~= nil then
-            love.graphics.setColor(Players.Player.R, Players.Player.G, Players.Player.B)
-            love.graphics.rectangle("fill", Players.Player.X, Players.Player.Y, Players.Player.W, Players.Player.H)
-            love.graphics.print(Players.Player.HP, 0, 0, 0, 3)
-        else
-            love.graphics.print("0", 0, 0, 0, 3)
-        end
-
-        if Players.Player2 ~= nil then
-            love.graphics.setColor(Players.Player2.R, Players.Player2.G, Players.Player2.B)
-            love.graphics.rectangle("fill", Players.Player2.X, Players.Player2.Y, Players.Player2.W, Players.Player2.H)
-            love.graphics.print(Players.Player2.HP, WinW - 30, 0, 0, 3)
-        else
-            love.graphics.print("0", WinW - 30, 0, 0, 3)
-        end
-
 
         -- CRIA SKILLS
         if Players.Player ~= nil then
@@ -143,19 +130,43 @@ function love.draw()
                 love.graphics.circle("fill", skill.X, skill.Y, skill.Raio)
             end
         end
-    end
 
 
-    --CRIA PODERES
-    love.graphics.setColor(255/255, 255/255, 255/255)
-    for _, poder in ipairs(TabelaPoderes) do
-        if poder.Id == 1 then
-            love.graphics.draw(Poder1Art, poder.X, poder.Y)
-        elseif poder.Id == 2 then
-            love.graphics.draw(Poder2Art, poder.X, poder.Y)
+        -- CRIA JOGADORES
+        if Players.Player ~= nil then
+            love.graphics.setColor(Players.Player.R, Players.Player.G, Players.Player.B)
+            love.graphics.draw(AnimacaoPlayer[Players.Player.Rotacao], Players.Player.X, Players.Player.Y)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print(Players.Player.HP, 0, 0, 0, 3)
+        else
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print("0", 0, 0, 0, 3)
         end
+
+        if Players.Player2 ~= nil then
+            love.graphics.setColor(Players.Player2.R, Players.Player2.G, Players.Player2.B)
+            love.graphics.draw(AnimacaoPlayer[Players.Player2.Rotacao], Players.Player2.X, Players.Player2.Y)
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print(Players.Player2.HP, WinW - 30, 0, 0, 3)
+        else
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.print("0", WinW - 30, 0, 0, 3)
+        end
+
+
+        --CRIA PODERES
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        for _, poder in ipairs(TabelaPoderes) do
+            if poder.Id == 1 then
+                love.graphics.draw(Poder1Art, poder.X, poder.Y)
+            elseif poder.Id == 2 then
+                love.graphics.draw(Poder2Art, poder.X, poder.Y)
+            end
+        end
+
     end
 end
+
 
 function love.keypressed(k)
     if k == "escape" then
@@ -166,14 +177,25 @@ function love.keypressed(k)
     end
 end
 
+
 function love.mousepressed(x, y, k)
     if Gamemode == 1 and k == 1 then
-        if x > love.graphics.getWidth()/2-100 and
+        if
+        x > love.graphics.getWidth()/2-100 and
         x < love.graphics.getWidth()/2+100 and
         y > love.graphics.getHeight()/2 and
         y < love.graphics.getHeight()/2+100
         then
             Gamemode = 2
+            Tempo = 0
+        elseif
+        x > love.graphics.getWidth()/2-100 and
+        x < love.graphics.getWidth()/2+100 and
+        y > love.graphics.getHeight()/2+125 and
+        y < love.graphics.getHeight()/2+225
+        then
+            Gamemode = 2
+            Tempo = 0
         end
     end
 end
