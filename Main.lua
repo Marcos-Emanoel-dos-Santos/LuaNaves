@@ -7,7 +7,7 @@ function love.load()
     -- Para que as coisas aleatórias funcionem
     math.randomseed(os.time())
 
-    dofile("ProjetosAula/proj10/Set.lua")
+    dofile("Set.lua")
 
     -- Por padrão o jogo é em fullscreen
     Fullscreen = true
@@ -17,6 +17,11 @@ function love.load()
     Titulo = love.graphics.newImage("img/GuerraDeNaves.png")
     Poder1Art = love.graphics.newImage("img/Poder1Img.png")
     Poder2Art = love.graphics.newImage("img/PowerUpImg.png")
+    SairArt = love.graphics.newImage("img/sair.png")
+    VoltarArt = love.graphics.newImage("img/voltar.png")
+    JogarArt = love.graphics.newImage("img/jogarBot.png")
+    OpcoesArt = love.graphics.newImage("img/opcoesBot.png")
+    AltTecArt = love.graphics.newImage("img/altTecBot.png")
 
     P_Up, P_Left, P_Down, P_Right, P_Atk = "w", "a", "s", "d", "f"
     P2_Up, P2_Left, P2_Down, P2_Right, P2_Atk = "up", "left", "down", "right", "l"
@@ -105,7 +110,7 @@ function love.update(dt)
         for i, player in pairs(Players) do
             if player.HP < 1 then
                 Players[i] = nil
-                dofile("ProjetosAula/proj10/Set.lua")
+                dofile("Set.lua")
             end
         end
     end
@@ -117,24 +122,20 @@ function love.draw()
     if Gamemode == 1 then
         -- IMAGEM "GUERRA DE NAVES" NA TELA
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.draw(Titulo, love.graphics.getWidth()/2-180, love.graphics.getHeight()/6, 0, 4)
+        love.graphics.draw(Titulo, love.graphics.getWidth()/2-150, love.graphics.getHeight()/10)
 
         -- CRIA BOTÃO DE JOGAR
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2, 200, 100)
-        love.graphics.setColor(0/255, 0/255, 0/255)
-        love.graphics.print("Jogar", love.graphics.getWidth()/2-30, love.graphics.getHeight()/2+35, 0, 2)
+        love.graphics.draw(JogarArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2-20)
 
         -- CRIA BOTÃO DE OPÇÕES
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2+125, 200, 100)
-        love.graphics.setColor(0/255, 0/255, 0/255)
-        love.graphics.print("Opções", love.graphics.getWidth()/2-43, love.graphics.getHeight()/2+160, 0, 2)
+        love.graphics.draw(OpcoesArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2+100)
 
+        -- CRIA X
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.rectangle("fill", 5, 5, 30, 30)
-        love.graphics.setColor(0/255, 0/255, 0/255)
-        love.graphics.print("X", 11, 5, 0, 2)
+        love.graphics.draw(SairArt, 5, 5)
+
     -- GAMEMODE JOGO
     elseif Gamemode == 2 then
         love.graphics.setBackgroundColor(0, 0, 0)
@@ -197,14 +198,11 @@ function love.draw()
     elseif Gamemode == 99 then
         -- GAMEMODE CONFIG
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.rectangle("fill", 5, 5, 30, 30)
-        love.graphics.setColor(0/255, 0/255, 0/255)
-        love.graphics.print("<-", 9, 9, 0, 1.5)
+        love.graphics.draw(VoltarArt, 5, 5)
+
 
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.rectangle("fill", love.graphics.getWidth()/2-100, love.graphics.getHeight()/2, 200, 100)
-        love.graphics.setColor(0/255, 0/255, 0/255)
-        love.graphics.print("Alterar teclas", love.graphics.getWidth()/2-81, love.graphics.getHeight()/2+38, 0 , 2)
+        love.graphics.draw(AltTecArt, love.graphics.getWidth()/2-53, love.graphics.getHeight()/2-20)
     end
 end
 
@@ -225,31 +223,31 @@ function love.mousepressed(x, y, k)
     if Gamemode == 1 and k == 1 then
         -- CLICOU EM "JOGAR"
         if
-        x > love.graphics.getWidth()/2-100 and
-        x < love.graphics.getWidth()/2+100 and
-        y > love.graphics.getHeight()/2 and
-        y < love.graphics.getHeight()/2+100
+        x > love.graphics.getWidth()/2-75 and
+        x < love.graphics.getWidth()/2+75 and
+        y > love.graphics.getHeight()/2-20 and
+        y < love.graphics.getHeight()/2+87
         then
             Gamemode = 2
             Tempo = 0
         elseif
         -- CLICOU EM "OPÇÕES"
-        x > love.graphics.getWidth()/2-100 and
-        x < love.graphics.getWidth()/2+100 and
-        y > love.graphics.getHeight()/2+125 and
-        y < love.graphics.getHeight()/2+225
+        x > love.graphics.getWidth()/2-75 and
+        x < love.graphics.getWidth()/2+75 and
+        y > love.graphics.getHeight()/2+100 and
+        y < love.graphics.getHeight()/2+207
         then
             Gamemode = 99
             Tempo = 0
         elseif
         -- CLICOU EM "X"
-        x > 5 and x < 30 and y > 5 and y < 30 then
+        x > 5 and x < 37 and y > 5 and y < 37 then
             love.event.push("quit")
         end
     end
     if Gamemode == 99 and k == 1 then
         -- CLICOU EM "<-""
-        if x > 5 and x < 30 and y > 5 and y < 30 then
+        if x > 5 and x < 37 and y > 5 and y < 37 then
             Gamemode = 1
         end
     end
