@@ -37,6 +37,7 @@ function Classe1:update(dt)
     end
 
     for i, v in ipairs(self.Buffs) do
+        -- FAZ EFEITO DO PODER
         v[1]()
         v.tempo = v.tempo - dt
         if v.tempo <= 0 then
@@ -107,6 +108,7 @@ function Classe1:inputTeclado(a, b, c, d, e, colidir)
         end
     end
     if love.keyboard.isDown(e) then
+        -- PRA CADA DIREÇÃO, DEFINE A ORIENTAÇÃO DA NAVE DEPENDENDO DA ULTIMA TECLA PRESSIONADA
         for _, v in ipairs(dir) do
             if v[1] == self.UltimoMovimento then
                 self.OrientacaoX = v[2][1]

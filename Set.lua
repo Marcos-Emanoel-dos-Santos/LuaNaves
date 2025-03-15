@@ -9,6 +9,7 @@ Players = {
     Player2 = Classe1:new(love.graphics.getWidth()-150, love.graphics.getHeight()-150)
 }
 
+
 Gamemode = 1
 Tempo = 0
 UltimoTempo = 0
