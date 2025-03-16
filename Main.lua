@@ -3,6 +3,8 @@ _G.Classe = require("PlayerEstr")
 _G.Power = require("poderesEstr")
 _G.Reset = require("Set")
 
+local anim8 = require("anim8")
+
 function love.load()
     -- Para que as coisas aleatórias funcionem
     math.randomseed(os.time())
@@ -22,9 +24,11 @@ function love.load()
     JogarArt = love.graphics.newImage("img/jogarBot.png")
     OpcoesArt = love.graphics.newImage("img/opcoesBot.png")
     AltTecArt = love.graphics.newImage("img/altTecBot.png")
+    GameOverArt = love.graphics.newImage("img/fimDeJogo.png")
 
     P_Up, P_Left, P_Down, P_Right, P_Atk = "w", "a", "s", "d", "f"
     P2_Up, P2_Left, P2_Down, P2_Right, P2_Atk = "up", "left", "down", "right", "l"
+    Winner = nil
 
     AnimacaoPlayer = {
         [1] = love.graphics.newImage("img/naveC.png"),
@@ -110,7 +114,12 @@ function love.update(dt)
         for i, player in pairs(Players) do
             if player.HP < 1 then
                 Players[i] = nil
-                dofile("Set.lua")
+                if i == 1 then
+                    Winner = 2
+                else
+                    Winner = 1
+                end
+                Gamemode = 3
             end
         end
     end
@@ -120,6 +129,7 @@ end
 function love.draw()
     -- GAMEMODE MAIN SCREEN
     if Gamemode == 1 then
+        love.graphics.setBackgroundColor(55/255, 55/255, 55/255)
         -- IMAGEM "GUERRA DE NAVES" NA TELA
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(Titulo, love.graphics.getWidth()/2-150, love.graphics.getHeight()/10)
@@ -194,6 +204,12 @@ function love.draw()
                 love.graphics.draw(Poder2Art, poder.X, poder.Y)
             end
         end
+    elseif Gamemode == 3 then
+        love.graphics.setBackgroundColor(55/255, 55/255, 55/255)
+
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        love.graphics.draw(GameOverArt, love.graphics.getWidth()/2-200, love.graphics.getHeight()/10)
+
 
     elseif Gamemode == 99 then
         -- GAMEMODE CONFIG

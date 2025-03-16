@@ -15,4 +15,3 @@ Tempo = 0
 UltimoTempo = 0
 TabelaPoderes = {}
 WinW = love.graphics.getWidth()
-love.graphics.setBackgroundColor(55/255, 55/255, 55/255)
