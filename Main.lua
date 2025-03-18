@@ -3,7 +3,6 @@ _G.Classe = require("PlayerEstr")
 _G.Power = require("poderesEstr")
 _G.Reset = require("Set")
 
-local anim8 = require("anim8")
 
 function love.load()
     -- Para que as coisas aleatórias funcionem
@@ -19,9 +18,12 @@ function love.load()
     Titulo = love.graphics.newImage("img/GuerraDeNaves.png")
     Poder1Art = love.graphics.newImage("img/Poder1Img.png")
     Poder2Art = love.graphics.newImage("img/PowerUpImg.png")
+    P1WinArt = love.graphics.newImage("img/p1Win.png")
+    P2WinArt = love.graphics.newImage("img/p2Win.png")
+
+    JogarArt = love.graphics.newImage("img/jogarBot.png")
     SairArt = love.graphics.newImage("img/sair.png")
     VoltarArt = love.graphics.newImage("img/voltar.png")
-    JogarArt = love.graphics.newImage("img/jogarBot.png")
     OpcoesArt = love.graphics.newImage("img/opcoesBot.png")
     AltTecArt = love.graphics.newImage("img/altTecBot.png")
     GameOverArt = love.graphics.newImage("img/fimDeJogo.png")
@@ -114,7 +116,7 @@ function love.update(dt)
         for i, player in pairs(Players) do
             if player.HP < 1 then
                 Players[i] = nil
-                if i == 1 then
+                if tostring(i) == "Player" then
                     Winner = 2
                 else
                     Winner = 1
@@ -130,14 +132,12 @@ function love.draw()
     -- GAMEMODE MAIN SCREEN
     if Gamemode == 1 then
         love.graphics.setBackgroundColor(55/255, 55/255, 55/255)
-        -- IMAGEM "GUERRA DE NAVES" NA TELA
+        -- "GUERRA DE NAVES"
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(Titulo, love.graphics.getWidth()/2-150, love.graphics.getHeight()/10)
-
         -- CRIA BOTÃO DE JOGAR
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(JogarArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2-20)
-
         -- CRIA BOTÃO DE OPÇÕES
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(OpcoesArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2+100)
@@ -210,6 +210,14 @@ function love.draw()
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(GameOverArt, love.graphics.getWidth()/2-200, love.graphics.getHeight()/10)
 
+        if Winner == 1 then
+            love.graphics.draw(P1WinArt, love.graphics.getWidth()/2-150, love.graphics.getHeight()/3)
+        else
+            love.graphics.draw(P2WinArt, love.graphics.getWidth()/2-150, love.graphics.getHeight()/3)
+        end
+
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        love.graphics.draw(VoltarArt, 5, 5)
 
     elseif Gamemode == 99 then
         -- GAMEMODE CONFIG
@@ -218,7 +226,7 @@ function love.draw()
 
 
         love.graphics.setColor(255/255, 255/255, 255/255)
-        love.graphics.draw(AltTecArt, love.graphics.getWidth()/2-53, love.graphics.getHeight()/2-20)
+        love.graphics.draw(AltTecArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2-20)
     end
 end
 
@@ -261,9 +269,16 @@ function love.mousepressed(x, y, k)
             love.event.push("quit")
         end
     end
-    if Gamemode == 99 and k == 1 then
-        -- CLICOU EM "<-""
+    if (Gamemode == 99 and k == 1) then
+        -- CLICOU EM "<-"
         if x > 5 and x < 37 and y > 5 and y < 37 then
+            Gamemode = 1
+        end
+    end
+    if Gamemode == 3 and k == 1 then
+        -- CLICOU EM "<-"
+        if x > 5 and x < 37 and y > 5 and y < 37 then
+            dofile("Set.lua")
             Gamemode = 1
         end
     end
