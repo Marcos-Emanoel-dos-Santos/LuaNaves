@@ -124,6 +124,8 @@ function love.update(dt)
                 Gamemode = 3
             end
         end
+    elseif Gamemode == 98 then
+        
     end
 end
 
@@ -227,7 +229,11 @@ function love.draw()
 
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(AltTecArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2-20)
+    elseif Gamemode == 98 then
+        love.graphics.setColor(255/255, 255/255, 255/255)
+        love.graphics.draw(VoltarArt, 5, 5)
     end
+
 end
 
 
@@ -269,17 +275,26 @@ function love.mousepressed(x, y, k)
             love.event.push("quit")
         end
     end
-    if (Gamemode == 99 and k == 1) then
-        -- CLICOU EM "<-"
-        if x > 5 and x < 37 and y > 5 and y < 37 then
-            Gamemode = 1
-        end
-    end
     if Gamemode == 3 and k == 1 then
         -- CLICOU EM "<-"
         if x > 5 and x < 37 and y > 5 and y < 37 then
             dofile("Set.lua")
             Gamemode = 1
+        end
+    end
+    if Gamemode == 99 and k == 1 then
+        -- CLICOU EM "<-"
+        if x > 5 and x < 37 and y > 5 and y < 37 then
+            Gamemode = 1
+        end
+        if x > love.graphics.getWidth()/2-75 and x < love.graphics.getWidth()/2+75 and
+        y > love.graphics.getHeight()/2-20 and y < love.graphics.getHeight()/2+87 then
+            Gamemode = 98
+        end
+    end
+    if Gamemode == 98 and k == 1 then
+        if x > 5 and x < 37 and y > 5 and y < 37 then
+            Gamemode = 99
         end
     end
 end
