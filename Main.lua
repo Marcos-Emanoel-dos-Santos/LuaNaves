@@ -27,10 +27,14 @@ function love.load()
     OpcoesArt = love.graphics.newImage("img/opcoesBot.png")
     AltTecArt = love.graphics.newImage("img/altTecBot.png")
     GameOverArt = love.graphics.newImage("img/fimDeJogo.png")
+    EscolheJogador = love.graphics.newImage("img/escolheJogador.png")
+    P1 = love.graphics.newImage("img/p1.png")
+    P2 = love.graphics.newImage("img/p2.png")
 
     P_Up, P_Left, P_Down, P_Right, P_Atk = "w", "a", "s", "d", "f"
     P2_Up, P2_Left, P2_Down, P2_Right, P2_Atk = "up", "left", "down", "right", "l"
     Winner = nil
+    P1C, P2C = 1, 177/255
 
     AnimacaoPlayer = {
         [1] = love.graphics.newImage("img/naveC.png"),
@@ -230,8 +234,17 @@ function love.draw()
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(AltTecArt, love.graphics.getWidth()/2-75, love.graphics.getHeight()/2-20)
     elseif Gamemode == 98 then
+        -- ALTERAR TECLAS
         love.graphics.setColor(255/255, 255/255, 255/255)
         love.graphics.draw(VoltarArt, 5, 5)
+
+        love.graphics.draw(EscolheJogador, love.graphics.getWidth()/2-276, love.graphics.getHeight()/10)
+
+        love.graphics.setColor(P1C, P1C, P1C)
+        love.graphics.draw(P1, love.graphics.getWidth()/4-75, love.graphics.getHeight()/3)
+
+        love.graphics.setColor(P2C, P2C, P2C)
+        love.graphics.draw(P2, love.graphics.getWidth()*3/4-75, love.graphics.getHeight()/3)
     end
 
 end
@@ -295,6 +308,16 @@ function love.mousepressed(x, y, k)
     if Gamemode == 98 and k == 1 then
         if x > 5 and x < 37 and y > 5 and y < 37 then
             Gamemode = 99
+            P1C, P2C = 177/255, 177/255
+        end
+
+        if x > love.graphics.getWidth()/4-75 and x < love.graphics.getWidth()/4+75 and
+        y > love.graphics.getHeight()/3 and y < love.graphics.getHeight()/3 + 75 then
+            P1C, P2C = 1, 177/255
+        end
+        if x > love.graphics.getWidth()*3/4-75 and x < love.graphics.getWidth()*3/4+75 and
+        y > love.graphics.getHeight()/3 and y < love.graphics.getHeight()/3 + 75 then
+            P2C, P1C = 1, 177/255
         end
     end
 end
